@@ -1,10 +1,18 @@
 import {Component} from 'react'
 import Cookies from 'js-cookie'
+import Loader from 'react-loader-spinner'
 import {BsSearch} from 'react-icons/bs'
 import Header from '../header'
 import JobCard from '../jobCard'
 
 import './index.css'
+
+const apiStatusConstants = {
+  initial: 'INITIAL',
+  success: 'SUCCESS',
+  failure: 'FAILURE',
+  inProgress: 'IN_PROGRESS',
+}
 
 const employmentTypesList = [
   {
@@ -51,6 +59,7 @@ class Jobs extends Component {
     employmentTypeList: [],
     jobsList: [],
     salaryOption: '',
+    status: apiStatusConstants.initial,
   }
 
   componentDidMount() {
@@ -59,6 +68,7 @@ class Jobs extends Component {
   }
 
   getJobs = async () => {
+    this.setState({status: apiStatusConstants.inProgress})
     const {inputSearchValue, employmentTypeList, salaryOption} = this.state
     const jwtToken = Cookies.get('jwt_token')
     const employmentTypesInSearching = employmentTypeList.join(',')
@@ -87,7 +97,12 @@ class Jobs extends Component {
         rating: eachJob.rating,
         title: eachJob.title,
       }))
-      this.setState({jobsList: [...fetchedJobsData]})
+      this.setState({
+        jobsList: [...fetchedJobsData],
+        status: apiStatusConstants.success,
+      })
+    } else {
+      this.setState({status: apiStatusConstants.failure})
     }
   }
 
@@ -206,7 +221,7 @@ class Jobs extends Component {
     this.getJobs()
   }
 
-  render() {
+  renderSuccessView = () => {
     const {inputSearchValue} = this.state
 
     return (
@@ -238,6 +253,49 @@ class Jobs extends Component {
         </div>
       </div>
     )
+  }
+
+  renderFailureView = () => (
+    <div className="failure-view">
+      <img
+        className="failure-image"
+        alt="failure view"
+        src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
+      />
+      <h1>Oops! Something Went Wrong</h1>
+      <p>We cannot seem to find the page you are looking for.</p>
+      <button
+        className="retry-button"
+        onClick={this.onClickRetryJobsButton}
+        type="button"
+      >
+        Retry
+      </button>
+    </div>
+  )
+
+  renderLoadingView = () => (
+    <div className="loader-container" data-testid="loader">
+      <Loader type="ThreeDots" color="#ffffff" height="50" width="50" />
+    </div>
+  )
+
+  renderAllTogether = () => {
+    const {status} = this.state
+    switch (status) {
+      case apiStatusConstants.failure:
+        return this.renderFailureView()
+      case apiStatusConstants.inProgress:
+        return this.renderLoadingView()
+      case apiStatusConstants.success:
+        return this.renderSuccessView()
+      default:
+        return null
+    }
+  }
+
+  render() {
+    return this.renderAllTogether()
   }
 }
 

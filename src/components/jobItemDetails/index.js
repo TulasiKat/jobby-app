@@ -1,5 +1,6 @@
 import {Component} from 'react'
 import Cookies from 'js-cookie'
+import Loader from 'react-loader-spinner'
 import {AiFillStar} from 'react-icons/ai'
 import {IoLocationSharp, IoBagRemoveSharp} from 'react-icons/io5'
 import {BiLinkExternal} from 'react-icons/bi'
@@ -7,14 +8,26 @@ import SimilarJobs from '../similarJobs'
 
 import './index.css'
 
+const apiStatusConstants = {
+  initial: 'INITIAL',
+  success: 'SUCCESS',
+  failure: 'FAILURE',
+  inProgress: 'IN_PROGRESS',
+}
+
 class JobItemDetails extends Component {
-  state = {singleJobDetails: {}, similarJobs: []}
+  state = {
+    singleJobDetails: {},
+    similarJobs: [],
+    apiStatus: apiStatusConstants.initial,
+  }
 
   componentDidMount() {
     this.getItemDetailsFunction()
   }
 
   getItemDetailsFunction = async () => {
+    this.setState({apiStatus: apiStatusConstants.inProgress})
     console.log('get details')
     const {match} = this.props
     const {params} = match
@@ -69,7 +82,10 @@ class JobItemDetails extends Component {
       this.setState({
         singleJobDetails: {...jobDetailsObject},
         similarJobs: [...similarJobsList],
+        apiStatus: apiStatusConstants.success,
       })
+    } else {
+      this.setState({apiStatus: apiStatusConstants.failure})
     }
   }
 
@@ -153,8 +169,30 @@ class JobItemDetails extends Component {
     )
   }
 
+  renderLoadingView = () => (
+    <div className="loader-container" data-testid="loader">
+      <Loader type="ThreeDots" color="#ffffff" height="50" width="50" />
+    </div>
+  )
+
+  renderFailureView = () => <p>failed</p>
+
+  renderAll = () => {
+    const {apiStatus} = this.state
+    switch (apiStatus) {
+      case apiStatusConstants.failure:
+        return this.renderFailureView()
+      case apiStatusConstants.inProgress:
+        return this.renderLoadingView()
+      case apiStatusConstants.success:
+        return this.renderEachItem()
+      default:
+        return null
+    }
+  }
+
   render() {
-    return <>{this.renderEachItem()}</>
+    return <>{this.renderAll()}</>
   }
 }
 
