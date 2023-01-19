@@ -1,0 +1,36 @@
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100vw;
+  padding: 10px;
+  font-family: roboto;
+  background-color: #383b38;
+  align-items: center;
+}
+.website-logo-header {
+  height: 30px;
+  width: 150px;
+}
+.header-middle-container {
+  display: flex;
+  list-style-type: none;
+  justify-content: space-around;
+  align-items: center;
+}
+.header-middle-names {
+  color: white;
+  font-weight: 500;
+  margin-right: 20px;
+}
+.logout-button {
+  background-color: #4f46e5;
+  padding: 10px;
+  color: white;
+  border-radius: 12px;
+  border: none;
+  width: 15%;
+  height: 80%;
+}
+.header-links {
+  text-decoration: none;
+}
