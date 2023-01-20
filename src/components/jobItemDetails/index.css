@@ -74,17 +74,20 @@
   color: #b6c5ff;
   width: 100%;
 }
-.description {
-  color: #ffffff;
+
+.description-headings {
+  color: white;
   font-family: Roboto;
-  font-size: 25px;
+  font-size: 27px;
   margin-bottom: 0;
 }
+
 .description-paragraph {
-  color: #ffffff;
+  color: #ced9d1;
   font-family: Roboto;
-  font-size: 15px;
+  font-size: 25px;
 }
+
 .item {
   display: flex;
 }
@@ -145,5 +148,16 @@
 }
 .full-container {
   background-color: black;
-  padding: 20px;
+}
+.skill-ul-container {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+  width: 70%;
+}
+.description {
+  color: white;
+  font-family: Roboto;
+  font-size: 78px;
+  margin-bottom: 0;
 }

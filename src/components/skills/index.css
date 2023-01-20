@@ -1,0 +1,16 @@
+.skill-image {
+  width: 30%;
+  margin-right: 12px;
+}
+.skill-name {
+  color: #ced9d1;
+  font-family: Roboto;
+  font-weight: 700;
+}
+.skill-container {
+  display: flex;
+  margin: 5px;
+  align-items: center;
+  width: 30%;
+  margin-bottom: 20px;
+}

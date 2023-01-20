@@ -67,6 +67,7 @@
   height: 45px;
   justify-content: space-between;
   border-radius: 12px;
+  margin-left: 39px;
 }
 
 .search-input-box {
@@ -94,4 +95,32 @@
   list-style-type: none;
   display: flex;
   flex-direction: column;
+}
+.no-jobs {
+  width: 450px;
+  height: 250px;
+  margin-top: 35px;
+}
+.no-jobs-heading {
+  color: #ffffff;
+
+  font-family: Roboto;
+}
+.no-jobs-para {
+  color: #ffffff;
+
+  font-family: Roboto;
+}
+.no-jobs-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.employment-type-item {
+  list-style-type: none;
+}
+.search-button {
+  background: none;
+  border: none;
 }

@@ -9,11 +9,11 @@
   background-color: #4d4a49;
   border-radius: 20px;
   width: 30%;
-  height: 50%;
+  height: 55%;
   padding: 30px;
   display: flex;
   flex-direction: column;
-  padding-bottom: 20px;
+  padding-bottom: 30px;
 }
 .website-logo-line {
   display: flex;
@@ -55,4 +55,8 @@ input {
     flex-direction: column;
     padding-bottom: 20px;
   }
+}
+.error_msg {
+  color: #ff0b37;
+  margin-top: 7px;
 }

@@ -59,7 +59,8 @@ class Jobs extends Component {
     employmentTypeList: [],
     jobsList: [],
     salaryOption: '',
-    status: apiStatusConstants.initial,
+    status: apiStatusConstants.inProgress,
+    profileFailure: false,
   }
 
   componentDidMount() {
@@ -68,14 +69,13 @@ class Jobs extends Component {
   }
 
   getJobs = async () => {
-    this.setState({status: apiStatusConstants.inProgress})
     const {inputSearchValue, employmentTypeList, salaryOption} = this.state
     const jwtToken = Cookies.get('jwt_token')
     const employmentTypesInSearching = employmentTypeList.join(',')
-    console.log(employmentTypesInSearching)
-    const getJobsApiUrl = `https://apis.ccbp.in/jobs?employment_type=${[
-      employmentTypesInSearching,
-    ]}&minimum_package=${salaryOption}&search=${inputSearchValue}`
+
+    const getJobsApiUrl = `https://apis.ccbp.in/jobs?employment_type=${employmentTypesInSearching}&minimum_package=${salaryOption}&search=${inputSearchValue}`
+    console.log(getJobsApiUrl)
+
     const options = {
       method: 'GET',
       headers: {
@@ -116,13 +116,20 @@ class Jobs extends Component {
       },
     }
     const response = await fetch(profileApiUrl, options)
-    const data = await response.json()
-    const profileDetails = {
-      name: data.profile_details.name,
-      profileImageUrl: data.profile_details.profile_image_url,
-      shortBio: data.profile_details.short_bio,
+    if (response.ok === true) {
+      const data = await response.json()
+      const profileDetails = {
+        name: data.profile_details.name,
+        profileImageUrl: data.profile_details.profile_image_url,
+        shortBio: data.profile_details.short_bio,
+      }
+      this.setState({
+        profileDetails: {...profileDetails},
+        profileFailure: false,
+      })
+    } else {
+      this.setState({status: apiStatusConstants.failure, profileFailure: true})
     }
-    this.setState({profileDetails: {...profileDetails}})
   }
 
   salaryOptionSelected = async event => {
@@ -169,18 +176,20 @@ class Jobs extends Component {
     return (
       <div className="employment-type-container">
         <h1 className="profile-part-headings">Type of Employment</h1>
-        {employmentTypesList.map(each => (
-          <li className="employment-type-item">
-            <input
-              type="checkbox"
-              id={each.employmentTypeId}
-              className="employment-type-checkbox"
-              onChange={this.employmentTypeChanged}
-              value={each.employmentTypeId}
-            />
-            <label htmlFor={each.salaryRangeId}>{each.label}</label>
-          </li>
-        ))}
+        <ul>
+          {employmentTypesList.map(each => (
+            <li className="employment-type-item" key={each.employmentTypeId}>
+              <input
+                type="checkbox"
+                id={each.employmentTypeId}
+                className="employment-type-checkbox"
+                onChange={this.employmentTypeChanged}
+                value={each.employmentTypeId}
+              />
+              <label htmlFor={each.salaryRangeId}>{each.label}</label>
+            </li>
+          ))}
+        </ul>
       </div>
     )
   }
@@ -190,19 +199,21 @@ class Jobs extends Component {
     return (
       <div className="employment-type-container">
         <h1 className="profile-part-headings">Salary Range</h1>
-        {salaryRangesList.map(each => (
-          <li className="employment-type-item">
-            <input
-              type="radio"
-              id={each.salaryRangeId}
-              className="employment-type-checkbox"
-              name="salary"
-              value={each.salaryRangeId}
-              onChange={this.salaryOptionSelected}
-            />
-            <label htmlFor={each.employmentTypeId}>{each.label}</label>
-          </li>
-        ))}
+        <ul>
+          {salaryRangesList.map(each => (
+            <li className="employment-type-item" key={each.salaryRangeId}>
+              <input
+                type="radio"
+                id={each.salaryRangeId}
+                className="employment-type-checkbox"
+                name="salary"
+                value={each.salaryRangeId}
+                onChange={this.salaryOptionSelected}
+              />
+              <label htmlFor={each.employmentTypeId}>{each.label}</label>
+            </li>
+          ))}
+        </ul>
       </div>
     )
   }
@@ -213,6 +224,9 @@ class Jobs extends Component {
 
   renderJobDetails = () => {
     const {jobsList} = this.state
+    if (jobsList.length <= 0) {
+      return this.renderNoJobsView()
+    }
 
     return jobsList.map(each => <JobCard details={each} key={each.id} />)
   }
@@ -221,15 +235,48 @@ class Jobs extends Component {
     this.getJobs()
   }
 
+  renderNoJobsView = () => (
+    <div className="no-jobs-container">
+      <img
+        className="no-jobs"
+        src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
+        alt="no jobs view"
+      />
+      <h1 className="no-jobs-heading">No Jobs Found</h1>
+      <p className="no-jobs-para">
+        We could not find any jobs. Try other filters.
+      </p>
+    </div>
+  )
+
+  onClickRetryJobsButton = () => {
+    this.setState({profileFailure: false}, this.getProfileDetails())
+  }
+
+  renderFailureViewProfile = () => {
+    console.log('profile view failed')
+    return (
+      <button
+        className="retry-button"
+        onClick={this.onClickRetryJobsButton}
+        type="button"
+      >
+        Retry
+      </button>
+    )
+  }
+
   renderSuccessView = () => {
-    const {inputSearchValue} = this.state
+    const {inputSearchValue, profileFailure} = this.state
 
     return (
       <div className="jobs-container">
         <Header />
         <div className="jobs-bottom-part">
           <div className="left-part">
-            {this.renderProfile()}
+            {profileFailure
+              ? this.renderFailureViewProfile()
+              : this.renderProfile()}
             <hr className="horizontal-line" />
             {this.renderEmploymentsType()}
             <hr className="horizontal-line" />
@@ -245,7 +292,14 @@ class Jobs extends Component {
                 onChange={this.searchValueEntered}
               />
               <div className="search-icon-container">
-                <BsSearch onClick={this.searchInitiated} />
+                <button
+                  onClick={this.searchInitiated}
+                  data-testid="searchButton"
+                  className="search-button"
+                  type="button"
+                >
+                  <BsSearch />
+                </button>
               </div>
             </div>
             <ul className="jobs-section">{this.renderJobDetails()}</ul>

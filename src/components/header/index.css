@@ -6,6 +6,7 @@
   font-family: roboto;
   background-color: #383b38;
   align-items: center;
+  list-style-type: none;
 }
 .website-logo-header {
   height: 30px;

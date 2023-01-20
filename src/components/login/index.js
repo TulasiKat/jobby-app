@@ -88,7 +88,7 @@ class Login extends Component {
           <button type="submit" className="login-button">
             Login
           </button>
-          {showingError ? <p className="error-msg"> *{errorMsg}</p> : null}
+          {showingError ? <p className="error_msg"> *{errorMsg}</p> : null}
         </form>
       </div>
     )
